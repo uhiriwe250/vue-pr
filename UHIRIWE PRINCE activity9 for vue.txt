@@ -1,0 +1,67 @@
+import axios from 'axios';
+
+const API_BASE_URL = 'https://jsonplaceholder.typicode.com'; // Example mock API
+
+// Submit a high score
+export async function submitHighScore(playerName, score) {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/scores`, {
+      playerName,
+      score,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error submitting score:', error);
+    throw error;
+  }
+}
+
+// Fetch high scores
+export async function fetchHighScores() {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/scores`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching scores:', error);
+    throw error;
+  }
+}
+
+
+
+import { submitHighScore, fetchHighScores } from './services/gameService';
+
+function endGame(finalScore) {
+  const playerName = prompt('Enter your name:');
+  submitHighScore(playerName, finalScore)
+    .then(data => console.log('Score submitted:', data))
+    .catch(err => console.error(err));
+}
+
+
+
+import { useEffect, useState } from 'react';
+import { fetchHighScores } from './services/gameService';
+
+function Leaderboard() {
+  const [scores, setScores] = useState([]);
+
+  useEffect(() => {
+    fetchHighScores()
+      .then(data => setScores(data))
+      .catch(err => console.error(err));
+  }, []);
+
+  return (
+    <ul>
+      {scores.map((score, index) => (
+        <li key={index}>
+          {score.playerName}: {score.score}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+export default Leaderboard;
+
